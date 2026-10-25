@@ -1,0 +1,16 @@
+[
+  {
+    "order": 38,
+    "providerID": "moonshotai",
+    "upstreamPackage": "@ai-sdk/moonshotai",
+    "factoryNames": [
+      "AIProviders.moonshotAI"
+    ],
+    "capabilities": [
+      "language"
+    ],
+    "files": false,
+    "skills": false,
+    "notes": "MoonshotAI was audited against upstream 3.0.78; its implemented chat-model surface remains at 3.0.37 semantics: `MOONSHOT_API_KEY`, custom base URL and headers, callable provider plus `languageModel`/`chat` aliases, `moonshotai.chat` provider IDs, versioned user-agent suffix, stream usage by default, current model IDs such as `kimi-k2.5`, `kimi-k2.6`, and `kimi-k2.7-code`, `providerOptions.moonshotai` thinking, reasoning effort/history, prompt-cache, and safety mapping, owned image/video/text input conversion with local unsupported-media errors, MFJS tool-schema normalization, structured outputs for `kimi-k*` models with top-level `$schema` stripping, Moonshot error schema, and unsupported embedding/image families. The 3.0.43 V1/Kimi partial and predicted output, message-name, log-probability, media-reference, reasoning/sampling, structured-output, response-metadata, raw-usage, and error-code delta remains deferred to a dedicated provider pass. The 2026-10-11 pass: Common max effort maps to high through the shared chat helper. The 2026-10-18 pass: All current and future model IDs inherit structured-output support; older separately deferred V1/Kimi codec gaps remain explicit. The 2026-10-23 pass: Generated content orders reasoning, function calls, then text; the broader V1/Kimi gaps remain deferred. The 2026-10-25 pass: Kimi K3.1 aliases inherit K3 reasoning history. Cache mode/TTL, cache-write token accounting and per-TTL headers are preserved; MFJS object unions retain their required object root. Missing stream completion signals are interrupted."
+  }
+]

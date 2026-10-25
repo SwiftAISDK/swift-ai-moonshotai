@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "package": "swift-ai-moonshotai",
+  "status": "coarse-import",
+  "upstream": [
+    {
+      "name": "@ai-sdk/moonshotai",
+      "implementation": [
+        "packages/moonshotai/src"
+      ],
+      "tests": [
+        "packages/moonshotai/src/convert-moonshotai-chat-usage.test.ts",
+        "packages/moonshotai/src/convert-to-moonshotai-chat-messages.test.ts",
+        "packages/moonshotai/src/lazy-schemas.test.ts",
+        "packages/moonshotai/src/moonshotai-chat-language-model.test.ts",
+        "packages/moonshotai/src/moonshotai-prepare-tools.test.ts",
+        "packages/moonshotai/src/moonshotai-provider.test.ts",
+        "packages/moonshotai/src/normalize-json-schema-for-mfjs.test.ts"
+      ]
+    }
+  ],
+  "swift": {
+    "sources": [
+      "Packages/swift-ai-moonshotai/Sources/SwiftAIMoonshotAI/MoonshotAIProvider.swift",
+      "Packages/swift-ai-moonshotai/Sources/SwiftAIMoonshotAI/OpenAICompatibleChatMoonshot.swift"
+    ],
+    "tests": [
+      "Packages/swift-ai-moonshotai/Tests/SwiftAIMoonshotAITests/FixtureDownloadTransport.swift",
+      "Packages/swift-ai-moonshotai/Tests/SwiftAIMoonshotAITests/MoonshotAIProviderTests.swift",
+      "Packages/swift-ai-moonshotai/Tests/SwiftAIMoonshotAITests/MoonshotAIProviderUpstreamTests.swift",
+      "Packages/swift-ai-moonshotai/Tests/SwiftAIMoonshotAITests/TestSupport.swift",
+      "Packages/swift-ai-moonshotai/Tests/SwiftAIMoonshotAITests/WeeklyMoonshot20261025Tests.swift"
+    ],
+    "resources": []
+  },
+  "differences": [
+    {
+      "kind": "native-adaptation",
+      "reason": "Preserve Swift async/await, Sendable, Foundation transport and existing documented gaps; see Docs/CoreV6Parity.md and PortingStatus.md."
+    }
+  ],
+  "reviewNote": "M6: provider runtime, configuration and focused tests extracted. Existing upstream baseline, capability boundaries and gaps retained."
+}
