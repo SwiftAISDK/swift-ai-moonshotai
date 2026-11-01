@@ -3,16 +3,19 @@
   "packages": [
     {
       "name": "@ai-sdk/moonshotai",
-      "reviewedVersion": "3.0.78",
+      "reviewedVersion": "3.0.82",
       "ledgerKind": "provider",
-      "evidence": "`AIProviders.moonshotAI`, `MoonshotLanguageModel`, `MoonshotAIProviderTests.swift`",
+      "evidence": "`AIProviders.moonshotAI`, `MoonshotLanguageModel`, `MoonshotAIProviderTests.swift`; 2026-11-01 delta: Docs/WeeklyUpstreamAudit20261101.json",
       "reviewStatus": "imported-reviewed-with-gaps",
-      "archiveIntegrity": "sha512-4B6IWo4/3r5K/sPkgk8/nx0B72K8vUh8fcBR3K8pZpGBFUMM9m6AksNUpIAWqe5s+cMTtyL0RklvfNxSwK/M3Q==",
-      "sourceRef": "npm:@ai-sdk/moonshotai@3.0.78",
-      "testRef": "682e2dd71456f14f9da33a1b983d1998c3a1184c",
-      "testRefRelationship": "inventory-snapshot-not-release-verified",
-      "contractFamilies": [],
-      "contractReview": "not-imported; inspect upstream declarations before extraction"
+      "archiveIntegrity": "sha512-dIaH0HNJbxZbzRt5yAcHGaYynW9YZpIWa5phsBerkaKcmONuDsQITWskFxp18E0PC1sDuCXdhxB/oDnmPr409g==",
+      "sourceRef": "npm:@ai-sdk/moonshotai@3.0.82",
+      "testRef": "9b603d36186b75e58d5479445a96c76f6e2d2700",
+      "testRefRelationship": "matching-release",
+      "contractFamilies": [
+        "LanguageModelV4",
+        "ProviderV4"
+      ],
+      "contractReview": "2026-11-01: published declarations, source and exact matching-release changed tests reviewed; scoped dispositions and Swift translations are in Docs/WeeklyUpstreamAudit20261101.json. Existing broader product gaps remain; reviewed delta is not full-package parity."
     }
   ]
 }

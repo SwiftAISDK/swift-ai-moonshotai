@@ -37,7 +37,7 @@ struct WeeklyMoonshot20261025Tests {
         #expect(metadata["moonshotai"]?["cacheWriteTokens"] == ["ttl5m": 0, "ttl1h": 21_248])
         let body = try decodeJSONBody(try #require(await transport.requests().first?.body))
         #expect(body["prompt_cache_options"] == ["mode": "implicit", "ttl": "1h"])
-        #expect(body["thinking"]?["keep"] == "all")
+        #expect(body["thinking"] == nil)
     }
 
     @Test func emptyCacheOptionsDefaultModeAndAbsentOptionsStayAbsent() throws {

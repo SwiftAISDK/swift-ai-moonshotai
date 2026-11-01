@@ -29,55 +29,61 @@ func moonshotChatBody(
         warnings.append(AIWarning(type: "unsupported", feature: "seed"))
     }
 
-    var thinking = body.removeValue(forKey: "thinking")?.objectValue ?? [:]
-    if !thinking.isEmpty {
-        var converted: [String: JSONValue] = [:]
-        if let type = thinking["type"] { converted["type"] = type }
-        if let budgetTokens = thinking["budgetTokens"] {
-            converted["budget_tokens"] = budgetTokens
-        } else if let budgetTokens = thinking["budget_tokens"] {
-            converted["budget_tokens"] = budgetTokens
-        }
-        thinking = converted
-    }
-
-    if body.removeValue(forKey: "reasoningHistory")?.stringValue == "preserved" {
-        if moonshotSupportsThinkingKeep(modelID: modelID) {
-            thinking["keep"] = .string("all")
-        } else {
-            warnings.append(AIWarning(
-                type: "unsupported",
-                feature: "reasoningHistory 'preserved' is not supported by model \"\(modelID)\""
-            ))
-        }
-    }
+    let requestedThinking = body.removeValue(forKey: "thinking")?.objectValue
+    let requestedEffort = (body.removeValue(forKey: "reasoningEffort") ?? body.removeValue(forKey: "reasoning_effort"))?.stringValue
+    let preserveReasoning = body.removeValue(forKey: "reasoningHistory")?.stringValue == "preserved"
     body.removeValue(forKey: "reasoning_history")
-
-    if !thinking.isEmpty {
-        body["thinking"] = .object(thinking)
+    if providerOptions["thinking"] != nil, requestedThinking?["budgetTokens"] != nil || requestedThinking?["budget_tokens"] != nil {
+        warnings.append(AIWarning(type: "deprecated", setting: "providerOptions.moonshotai.thinking.budgetTokens", message: "Moonshot Chat Completions does not support budget_tokens. Remove budgetTokens; the option has been omitted."))
     }
-
-    if let value = body.removeValue(forKey: "reasoningEffort") {
-        body["reasoning_effort"] = value
+    let isK3 = ["kimi-k3", "kimi-k3.1-pro", "kimi-k3.1-pro-highspeed"].contains(modelID)
+    let isK27 = ["kimi-k2.7-code", "kimi-k2.7-code-highspeed"].contains(modelID)
+    let isK25 = modelID == "kimi-k2.5"
+    let isK26 = modelID == "kimi-k2.6"
+    let isV1 = modelID.hasPrefix("moonshot-v1-")
+    let thinkingType = requestedThinking?["type"]?.stringValue
+    func warnEffort() {
+        if requestedEffort != nil { warnings.append(AIWarning(type: "unsupported", feature: "reasoningEffort", message: "reasoningEffort is only supported by Kimi K3 and has been omitted for model \(modelID).")) }
     }
-    if body["reasoning_effort"] == nil, let reasoning = request.reasoning {
-        switch reasoning {
-        case "provider-default":
-            break
-        case "none":
-            warnings.append(AIWarning(
-                type: "unsupported",
-                feature: "reasoning \"none\" (use providerOptions.moonshotai.thinking to control thinking)"
-            ))
-        case "minimal", "low":
-            body["reasoning_effort"] = .string("low")
-        case "medium", "high":
-            body["reasoning_effort"] = .string("high")
-        case "xhigh", "max":
-            body["reasoning_effort"] = .string("max")
-        default:
-            warnings.append(AIWarning(type: "unsupported", feature: "reasoning effort \(reasoning)"))
+    func warnHistory() {
+        if preserveReasoning { warnings.append(AIWarning(type: "unsupported", feature: "reasoningHistory 'preserved' is not supported by model \"\(modelID)\"")) }
+    }
+    if isK3 {
+        if requestedThinking != nil { warnings.append(AIWarning(type: "unsupported", feature: "thinking", message: "Kimi K3 always reasons and does not accept the thinking field. The option has been omitted.")) }
+        if let effort = mapReasoningToProviderEffort(reasoning: request.reasoning, effortMap: ["low": "low", "high": "high", "max": "max"], warnings: &warnings, providerOptionsEffort: requestedEffort) { body["reasoning_effort"] = .string(effort) }
+    } else if isK27 {
+        warnEffort()
+        if thinkingType == "disabled" {
+            warnings.append(AIWarning(type: "unsupported", feature: "thinking.type \"disabled\"", message: "Kimi K2.7 thinking cannot be disabled."))
+        } else if requestedThinking == nil, request.reasoning == "none" {
+            warnings.append(AIWarning(type: "compatibility", feature: "reasoning", message: "reasoning \"none\" is not supported by Kimi K2.7; thinking cannot be disabled. Using thinking enabled instead."))
+        } else if thinkingType == "enabled" { body["thinking"] = ["type": "enabled"] }
+    } else if isK25 || isK26 {
+        warnEffort()
+        let type = thinkingType ?? (isCustomReasoning(request.reasoning) ? request.reasoning == "none" ? "disabled" : "enabled" : nil)
+        if type != nil || (isK26 && preserveReasoning) {
+            var thinking: [String: JSONValue] = ["type": .string(type ?? "enabled")]
+            if isK26 && preserveReasoning { thinking["keep"] = "all" }
+            body["thinking"] = .object(thinking)
         }
+        if isK25 { warnHistory() }
+    } else if isV1 {
+        warnEffort()
+        if requestedThinking != nil { warnings.append(AIWarning(type: "unsupported", feature: "thinking", message: "thinking is not supported by model \"\(modelID)\" and has been omitted.")) }
+        if isCustomReasoning(request.reasoning), request.reasoning != "none" { warnings.append(AIWarning(type: "unsupported", feature: "reasoning", message: "reasoning is not supported by model \"\(modelID)\".")) }
+        warnHistory()
+    } else {
+        if let type = thinkingType { body["thinking"] = ["type": .string(type)] }
+        else if request.reasoning == "none" { body["thinking"] = ["type": "disabled"] }
+        if let requestedEffort { body["reasoning_effort"] = .string(requestedEffort) }
+        else if request.reasoning != "none", let effort = mapReasoningToProviderEffort(reasoning: request.reasoning, effortMap: ["low": "low", "high": "high", "max": "max"], warnings: &warnings) { body["reasoning_effort"] = .string(effort) }
+        warnHistory()
+    }
+
+    // Preserve the native extraBody escape hatch; typed budgetTokens follows the provider's deprecation policy.
+    if providerOptions["thinking"] == nil, let budget = requestedThinking?["budgetTokens"] ?? requestedThinking?["budget_tokens"], var thinking = body["thinking"]?.objectValue {
+        thinking["budget_tokens"] = budget
+        body["thinking"] = .object(thinking)
     }
 
     if let value = body.removeValue(forKey: "promptCacheKey") {
@@ -100,10 +106,6 @@ func moonshotChatBody(
 
 func moonshotSupportsStructuredOutputs(modelID: String) -> Bool {
     true
-}
-
-func moonshotSupportsThinkingKeep(modelID: String) -> Bool {
-    modelID == "kimi-k2.6" || ["kimi-k3", "kimi-k3.1-pro", "kimi-k3.1-pro-highspeed"].contains(modelID) || modelID.hasPrefix("kimi-k2.7-code")
 }
 
 func moonshotProviderOptions(from providerOptions: [String: JSONValue]) throws -> [String: JSONValue] {

@@ -29,6 +29,8 @@
       "Packages/swift-ai-moonshotai/Tests/SwiftAIMoonshotAITests/MoonshotAIProviderTests.swift",
       "Packages/swift-ai-moonshotai/Tests/SwiftAIMoonshotAITests/MoonshotAIProviderUpstreamTests.swift",
       "Packages/swift-ai-moonshotai/Tests/SwiftAIMoonshotAITests/TestSupport.swift",
+      "Packages/swift-ai-moonshotai/Tests/SwiftAIMoonshotAITests/Weekly20261101BehaviorTests.swift",
+      "Packages/swift-ai-moonshotai/Tests/SwiftAIMoonshotAITests/Weekly20261101CredentialsTests.swift",
       "Packages/swift-ai-moonshotai/Tests/SwiftAIMoonshotAITests/WeeklyMoonshot20261025Tests.swift"
     ],
     "resources": []
@@ -37,7 +39,15 @@
     {
       "kind": "native-adaptation",
       "reason": "Preserve Swift async/await, Sendable, Foundation transport and existing documented gaps; see Docs/CoreV6Parity.md and PortingStatus.md."
+    },
+    {
+      "kind": "native-adaptation",
+      "reason": "2026-11-01: integrity-verified @ai-sdk/moonshotai 3.0.78 -> 3.0.82 source/declarations reviewed with exact matching-release tests 612be2311464804d1e4897afacbf8f3fc2f6d9e3 -> 9b603d36186b75e58d5479445a96c76f6e2d2700; focused Weekly20261101 assertions cover the published deltas and native credential settings. Existing coarse/imported mappings and earlier gaps remain unpromoted. K3 portable none/minimal/medium map to low and xhigh to high; explicit canonical native effort retains precedence. Exact K2.7 models retain enabled service thinking for portable none with a compatibility warning; explicit disabled thinking remains unsupported. Unknown models send none as disabled thinking. Separate explicit thinking from preserved-history controls: K3 omits the thinking field; K2.6 keep-all remains available. Typed deprecated budgetTokens is omitted with a warning; native raw extraBody retains its existing budget escape hatch. Add lazy apiKeyProvider across language requests."
+    },
+    {
+      "kind": "native-adaptation",
+      "reason": "The native raw extraBody escape hatch retains explicitly supplied thinking budgets; typed providerOptions follows the published omission/deprecation policy. This does not imply the service accepts unsupported settings."
     }
   ],
-  "reviewNote": "M6: provider runtime, configuration and focused tests extracted. Existing upstream baseline, capability boundaries and gaps retained."
+  "reviewNote": "M6: provider runtime, configuration and focused tests extracted. Existing upstream baseline, capability boundaries and gaps retained. 2026-11-01: integrity-verified @ai-sdk/moonshotai 3.0.78 -> 3.0.82 source/declarations reviewed with exact matching-release tests 612be2311464804d1e4897afacbf8f3fc2f6d9e3 -> 9b603d36186b75e58d5479445a96c76f6e2d2700; focused Weekly20261101 assertions cover the published deltas and native credential settings. Existing coarse/imported mappings and earlier gaps remain unpromoted."
 }

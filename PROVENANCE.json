@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
   "package": "swift-ai-moonshotai",
-  "version": "1.0.0",
-  "releaseID": "modular-3",
+  "version": "1.1.0",
+  "releaseID": "weekly-upstream-20261101",
   "source": {
-    "commit": "7fc9b4cd72f8f83b75ba7eee2e38d37127539317",
-    "baseCommit": "7fc9b4cd72f8f83b75ba7eee2e38d37127539317",
+    "commit": "ea057797494ab9bb66df8c6bfd8edc10245b20e7",
+    "baseCommit": "ea057797494ab9bb66df8c6bfd8edc10245b20e7",
     "workingTree": false,
-    "inputsSHA256": "49b802ba4a30454f78c9886ab3114537ef659ab3e6db7775479b7351f6e3f0ab"
+    "inputsSHA256": "b46f3e07b0a583d6fee81035987d74a06fc5c6109cbdf228144d1172d2c3676e"
   },
   "dependencies": [
     {
       "package": "swift-ai-core",
-      "from": "1.1.0"
+      "from": "1.2.0"
     },
     {
       "package": "swift-ai-openai-compatible",
@@ -21,25 +21,28 @@
   ],
   "changes": [
     {
-      "id": "remaining-package-extraction",
-      "notes": "Extract the existing runtime, typed settings and standalone tests from the compatibility aggregate. Preserve the reviewed npm baseline and existing capability/gap boundaries.",
-      "compatibility": "Initial independent Swift package version. Existing SwiftAISDK entry points remain in the development compatibility facade; no npm-version equivalence is implied."
+      "id": "weekly-upstream-20261101",
+      "notes": "K3 portable none/minimal/medium map to low and xhigh to high; explicit canonical native effort retains precedence. Exact K2.7 models retain enabled service thinking for portable none with a compatibility warning; explicit disabled thinking remains unsupported. Unknown models send none as disabled thinking. Reviewed upstream: @ai-sdk/moonshotai 3.0.78 to 3.0.82. Validation passed: node Scripts/test-packages.mjs (all 52 owning package suites and the compatibility facade); node Scripts/sdk.mjs generate --check; node --test Scripts/tests/*.test.cjs (27 passed); docs-site check and build (100 pages). Live provider calls were not run.",
+      "compatibility": "Minor release for additive native API; existing static settings and call sites remain compatible. Updated direct dependency minimums are recorded in the manifest. Existing documented JS/framework and native product gaps remain; version-delta review does not imply full parity or live-service testing. Explicit custom authentication skips an unused credential supplier, a deliberate native callback-order adaptation."
     }
   ],
   "canonicalDirectory": "Packages/swift-ai-moonshotai",
   "upstream": [
     {
       "name": "@ai-sdk/moonshotai",
-      "reviewedVersion": "3.0.78",
+      "reviewedVersion": "3.0.82",
       "ledgerKind": "provider",
-      "evidence": "`AIProviders.moonshotAI`, `MoonshotLanguageModel`, `MoonshotAIProviderTests.swift`",
+      "evidence": "`AIProviders.moonshotAI`, `MoonshotLanguageModel`, `MoonshotAIProviderTests.swift`; 2026-11-01 delta: Docs/WeeklyUpstreamAudit20261101.json",
       "reviewStatus": "imported-reviewed-with-gaps",
-      "archiveIntegrity": "sha512-4B6IWo4/3r5K/sPkgk8/nx0B72K8vUh8fcBR3K8pZpGBFUMM9m6AksNUpIAWqe5s+cMTtyL0RklvfNxSwK/M3Q==",
-      "sourceRef": "npm:@ai-sdk/moonshotai@3.0.78",
-      "testRef": "682e2dd71456f14f9da33a1b983d1998c3a1184c",
-      "testRefRelationship": "inventory-snapshot-not-release-verified",
-      "contractFamilies": [],
-      "contractReview": "not-imported; inspect upstream declarations before extraction"
+      "archiveIntegrity": "sha512-dIaH0HNJbxZbzRt5yAcHGaYynW9YZpIWa5phsBerkaKcmONuDsQITWskFxp18E0PC1sDuCXdhxB/oDnmPr409g==",
+      "sourceRef": "npm:@ai-sdk/moonshotai@3.0.82",
+      "testRef": "9b603d36186b75e58d5479445a96c76f6e2d2700",
+      "testRefRelationship": "matching-release",
+      "contractFamilies": [
+        "LanguageModelV4",
+        "ProviderV4"
+      ],
+      "contractReview": "2026-11-01: published declarations, source and exact matching-release changed tests reviewed; scoped dispositions and Swift translations are in Docs/WeeklyUpstreamAudit20261101.json. Existing broader product gaps remain; reviewed delta is not full-package parity."
     }
   ],
   "note": "Independent port. Imported test refs and contract review gaps retain their original status; export is not new upstream parity proof.",
@@ -58,7 +61,7 @@
     },
     {
       "canonicalPath": "Packages/swift-ai-moonshotai/Porting/map.json",
-      "sha256": "278a0c66ba09c803075dd0fb75bf55d7077cc01e636797e6112dc6d9f8588a74"
+      "sha256": "075e181af0931c63e1166030e258698be97a4ec53615cc8c0705f529b9df09ad"
     },
     {
       "canonicalPath": "Packages/swift-ai-moonshotai/README.md",
@@ -66,11 +69,11 @@
     },
     {
       "canonicalPath": "Packages/swift-ai-moonshotai/Sources/SwiftAIMoonshotAI/MoonshotAIProvider.swift",
-      "sha256": "9eaadb2111e8f9db626af70134ee95c7bc17a51cb1e7d18330a80a6cbab7fb64"
+      "sha256": "c161c9af4a685058008340d44e1da36bf50265c7609548c41585e3cd1e93b5a5"
     },
     {
       "canonicalPath": "Packages/swift-ai-moonshotai/Sources/SwiftAIMoonshotAI/OpenAICompatibleChatMoonshot.swift",
-      "sha256": "0d07545a0f789b68030e910736460e33e4bbca6d074d034dc03db96a2f570989"
+      "sha256": "c420c64fc1d32fc4e774ba5e4d6e11cf13bc2b4a3305a9dd946712b3424a653b"
     },
     {
       "canonicalPath": "Packages/swift-ai-moonshotai/Tests/SwiftAIMoonshotAITests/FixtureDownloadTransport.swift",
@@ -78,7 +81,7 @@
     },
     {
       "canonicalPath": "Packages/swift-ai-moonshotai/Tests/SwiftAIMoonshotAITests/MoonshotAIProviderTests.swift",
-      "sha256": "b921bb2ef9be41be7b5ed3ecc243152691b8b9cf836b647c6d6b569a5121dee5"
+      "sha256": "9a3aec9c31886d5a641f4d8b053cbafc685737f2e965c40e41b1af7da905b885"
     },
     {
       "canonicalPath": "Packages/swift-ai-moonshotai/Tests/SwiftAIMoonshotAITests/MoonshotAIProviderUpstreamTests.swift",
@@ -89,8 +92,16 @@
       "sha256": "2bec64e9ad139ddb0dbf62c1c7c03c1003dc8046cbdeefc78134df3f4df3f1fe"
     },
     {
+      "canonicalPath": "Packages/swift-ai-moonshotai/Tests/SwiftAIMoonshotAITests/Weekly20261101BehaviorTests.swift",
+      "sha256": "58e09959bec7e48ca5bb9d2d5f3da817b0d146928c5d5bf4970cf03d8cb3c682"
+    },
+    {
+      "canonicalPath": "Packages/swift-ai-moonshotai/Tests/SwiftAIMoonshotAITests/Weekly20261101CredentialsTests.swift",
+      "sha256": "b8a43517bcd7c230c6b8cc6ab56893bb6d237695615ab35c2abc48debf4dc6c1"
+    },
+    {
       "canonicalPath": "Packages/swift-ai-moonshotai/Tests/SwiftAIMoonshotAITests/WeeklyMoonshot20261025Tests.swift",
-      "sha256": "94558d7ba63552a7059acf035b8d7b73885640f134931fdb62131fed9052ff2c"
+      "sha256": "9ec0e8853c6acc68fc6489ade70ea41fcc41f46031f9cc3ddae29045d52fd94b"
     }
   ]
 }

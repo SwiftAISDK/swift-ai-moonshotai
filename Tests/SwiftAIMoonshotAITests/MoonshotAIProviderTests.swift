@@ -46,13 +46,13 @@ import Testing
     let request = try #require(await transport.requests().first)
     #expect(request.url.absoluteString == "https://api.moonshot.ai/v1/chat/completions")
     #expect(request.headers["authorization"] == "Bearer moonshot-key")
-    #expect(request.headers["user-agent"] == "ai-sdk-moonshotai/3.0.78")
+    #expect(request.headers["user-agent"] == "ai-sdk-moonshotai/3.0.82")
     let body = try decodeJSONBody(try #require(request.body))
     #expect(body["moonshotai"] == nil)
     #expect(body["extraRaw"]?.stringValue == "keep-me")
     #expect(body["extraProviderOption"] == nil)
     #expect(body["thinking"]?["type"]?.stringValue == "enabled")
-    #expect(body["thinking"]?["budget_tokens"]?.intValue == 1024)
+    #expect(body["thinking"]?["budget_tokens"] == nil)
     #expect(body["thinking"]?["budgetTokens"] == nil)
     #expect(body["thinking"]?["extra"] == nil)
     #expect(body["thinking"]?["keep"]?.stringValue == "all")
@@ -74,7 +74,7 @@ import Testing
     _ = try await model.generate(LanguageModelRequest(messages: [.user("Hi")]))
 
     let request = try #require(await transport.requests().first)
-    #expect(request.headers["user-agent"] == "TestApp/1.0 ai-sdk-moonshotai/3.0.78")
+    #expect(request.headers["user-agent"] == "TestApp/1.0 ai-sdk-moonshotai/3.0.82")
     #expect(request.headers["authorization"] == "Bearer moonshot-key")
 }
 
@@ -242,10 +242,11 @@ import Testing
     #expect(result.warnings == [
         AIWarning(type: "unsupported", feature: "topK"),
         AIWarning(type: "unsupported", feature: "seed"),
+        AIWarning(type: "unsupported", feature: "reasoningEffort", message: "reasoningEffort is only supported by Kimi K3 and has been omitted for model kimi-k2.5."),
         AIWarning(type: "unsupported", feature: "reasoningHistory 'preserved' is not supported by model \"kimi-k2.5\"")
     ])
     let body = try decodeJSONBody(try #require((await transport.requests()).first?.body))
-    #expect(body["reasoning_effort"]?.stringValue == "low")
+    #expect(body["reasoning_effort"] == nil)
     #expect(body["prompt_cache_key"]?.stringValue == "session-1")
     #expect(body["safety_identifier"]?.stringValue == "user-hash")
     #expect(body["seed"] == nil)
@@ -264,7 +265,7 @@ import Testing
     #expect(result.reasoning == "think")
     #expect(result.content == [.reasoning("think"), .text("moon")])
     let body = try decodeJSONBody(try #require((await transport.requests()).first?.body))
-    #expect(body["reasoning_effort"]?.stringValue == "max")
+    #expect(body["reasoning_effort"]?.stringValue == "high")
 }
 
 @Test func moonshotLanguageConvertsVideoReferencesAndAssistantHistoryLikeUpstream() async throws {
