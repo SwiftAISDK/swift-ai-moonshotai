@@ -386,24 +386,17 @@ func moonshotNormalizeJSONSchemaForMFJS(_ schema: JSONValue, isRoot: Bool = true
 
     if let tuple = object["items"]?.arrayValue {
         let existing = object["prefixItems"]?.arrayValue ?? []
-        object["prefixItems"] = .array(try existing + tuple.map {
-            try moonshotNormalizeJSONSchemaForMFJS($0, isRoot: false)
-        })
+        // Traverse only in the generic pass below, preserving positional order.
+        object["prefixItems"] = .array(existing + tuple)
         object.removeValue(forKey: "items")
-    } else if let items = object["items"] {
-        object["items"] = try moonshotNormalizeJSONSchemaForMFJS(items, isRoot: false)
     }
 
     if !isRoot, let parentType = object["type"]?.stringValue, let anyOf = object["anyOf"]?.arrayValue {
         object.removeValue(forKey: "type")
-        object["anyOf"] = .array(try anyOf.map { branch in
-            guard var branchObject = branch.objectValue else {
-                return try moonshotNormalizeJSONSchemaForMFJS(branch, isRoot: false)
-            }
-            if branchObject["type"] == nil {
-                branchObject["type"] = .string(parentType)
-            }
-            return try moonshotNormalizeJSONSchemaForMFJS(.object(branchObject), isRoot: false)
+        object["anyOf"] = .array(anyOf.map { branch in
+            guard var branchObject = branch.objectValue else { return branch }
+            if branchObject["type"] == nil { branchObject["type"] = .string(parentType) }
+            return .object(branchObject)
         })
     }
 

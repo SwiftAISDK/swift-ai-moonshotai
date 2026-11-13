@@ -46,7 +46,7 @@ public final class MoonshotAIProvider: AIProvider, Sendable {
         }
         var headers = normalizeHeaders(configuration.headers)
         headers["authorization"] = headers["authorization"] ?? "Bearer \(key)"
-        headers = withUserAgentSuffix(headers, "ai-sdk-moonshotai/3.0.87")
+        headers = withUserAgentSuffix(headers, "ai-sdk-moonshotai/3.0.92")
         let baseURL = withoutTrailingSlash(configuration.baseURL ?? "https://api.moonshot.ai/v1")
         let http = AIProviderHTTPClient(providerID: "moonshotai", headers: headers, transport: configuration.transport,
             url: { _, path in try providerURL("\(baseURL)\(path)", queryParams: configuration.queryParams) })
