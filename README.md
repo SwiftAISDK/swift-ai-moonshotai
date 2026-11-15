@@ -1,5 +1,5 @@
 <!-- Generated distribution; edit the canonical repository. -->
-# swift-ai-moonshotai 1.1.2
+# swift-ai-moonshotai 1.1.3
 
 Independent Swift-native port of Vercel AI SDK. Source and upstream dispositions are in PROVENANCE.json and Porting/.
 
@@ -8,7 +8,7 @@ Independent Swift-native port of Vercel AI SDK. Source and upstream dispositions
 Add this package to your SwiftPM dependencies:
 
 ```swift
-.package(url: "https://github.com/SwiftAISDK/swift-ai-moonshotai.git", from: "1.1.2")
+.package(url: "https://github.com/SwiftAISDK/swift-ai-moonshotai.git", from: "1.1.3")
 ```
 
 Products: `SwiftAIMoonshotAI`.
