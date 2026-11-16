@@ -24,11 +24,13 @@
   ],
   "swift": {
     "sources": [
+      "Sources/SwiftAIMoonshotAI/MoonshotAIChatLanguageModel.swift",
       "Sources/SwiftAIMoonshotAI/MoonshotAIProvider.swift",
       "Sources/SwiftAIMoonshotAI/OpenAICompatibleChatMoonshot.swift"
     ],
     "tests": [
       "Tests/SwiftAIMoonshotAITests/FixtureDownloadTransport.swift",
+      "Tests/SwiftAIMoonshotAITests/MoonshotAIChatLanguageModelUpstreamTests.swift",
       "Tests/SwiftAIMoonshotAITests/MoonshotAIProviderTests.swift",
       "Tests/SwiftAIMoonshotAITests/MoonshotAIProviderUpstreamTests.swift",
       "Tests/SwiftAIMoonshotAITests/TestSupport.swift",

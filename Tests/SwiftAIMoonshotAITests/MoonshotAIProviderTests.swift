@@ -195,28 +195,28 @@ import Testing
     let provider = try AIProviders.moonshotAI(configuration: MoonshotAIProviderSettings(apiKey: "moonshot-key", transport: RecordingTransport(response: jsonResponse("{}"))))
     let model = try provider.languageModel("kimi-k2-thinking")
 
-    await #expect(throws: AIError.invalidArgument(argument: "providerOptions.moonshotai", message: "MoonshotAI provider options must be an object.")) {
+    await #expect(throws: AIError.invalidArgument(argument: "providerOptions", message: "invalid moonshotai provider options")) {
         _ = try await model.generate(LanguageModelRequest(messages: [.user("Hi")], providerOptions: ["moonshotai": "bad"]))
     }
-    await #expect(throws: AIError.invalidArgument(argument: "providerOptions.moonshotai.thinking", message: "MoonshotAI thinking must be an object.")) {
+    await #expect(throws: AIError.invalidArgument(argument: "providerOptions", message: "invalid moonshotai provider options")) {
         _ = try await model.generate(LanguageModelRequest(messages: [.user("Hi")], providerOptions: ["moonshotai": ["thinking": .null]]))
     }
-    await #expect(throws: AIError.invalidArgument(argument: "providerOptions.moonshotai.thinking.type", message: "MoonshotAI thinking.type must be enabled or disabled.")) {
+    await #expect(throws: AIError.invalidArgument(argument: "providerOptions", message: "invalid moonshotai provider options")) {
         _ = try await model.generate(LanguageModelRequest(messages: [.user("Hi")], providerOptions: ["moonshotai": ["thinking": ["type": "auto"]]]))
     }
-    await #expect(throws: AIError.invalidArgument(argument: "providerOptions.moonshotai.thinking.budgetTokens", message: "MoonshotAI thinking.budgetTokens must be an integer greater than or equal to 1024.")) {
+    await #expect(throws: AIError.invalidArgument(argument: "providerOptions", message: "invalid moonshotai provider options")) {
         _ = try await model.generate(LanguageModelRequest(messages: [.user("Hi")], providerOptions: ["moonshotai": ["thinking": ["budgetTokens": 1023]]]))
     }
-    await #expect(throws: AIError.invalidArgument(argument: "providerOptions.moonshotai.thinking.budgetTokens", message: "MoonshotAI thinking.budgetTokens must be an integer greater than or equal to 1024.")) {
+    await #expect(throws: AIError.invalidArgument(argument: "providerOptions", message: "invalid moonshotai provider options")) {
         _ = try await model.generate(LanguageModelRequest(messages: [.user("Hi")], providerOptions: ["moonshotai": ["thinking": ["budgetTokens": 1024.5]]]))
     }
-    await #expect(throws: AIError.invalidArgument(argument: "providerOptions.moonshotai.reasoningHistory", message: "MoonshotAI reasoningHistory must be disabled, interleaved, or preserved.")) {
+    await #expect(throws: AIError.invalidArgument(argument: "providerOptions", message: "invalid moonshotai provider options")) {
         _ = try await model.generate(LanguageModelRequest(messages: [.user("Hi")], providerOptions: ["moonshotai": ["reasoningHistory": "auto"]]))
     }
-    await #expect(throws: AIError.invalidArgument(argument: "providerOptions.moonshotai.reasoningEffort", message: "MoonshotAI reasoningEffort must be low, high, or max.")) {
+    await #expect(throws: AIError.invalidArgument(argument: "providerOptions", message: "invalid moonshotai provider options")) {
         _ = try await model.generate(LanguageModelRequest(messages: [.user("Hi")], providerOptions: ["moonshotai": ["reasoningEffort": "medium"]]))
     }
-    await #expect(throws: AIError.invalidArgument(argument: "providerOptions.moonshotai.promptCacheKey", message: "MoonshotAI promptCacheKey must be a string.")) {
+    await #expect(throws: AIError.invalidArgument(argument: "providerOptions", message: "invalid moonshotai provider options")) {
         _ = try await model.generate(LanguageModelRequest(messages: [.user("Hi")], providerOptions: ["moonshotai": ["promptCacheKey": 1]]))
     }
 }
@@ -242,7 +242,7 @@ import Testing
     #expect(result.warnings == [
         AIWarning(type: "unsupported", feature: "topK"),
         AIWarning(type: "unsupported", feature: "seed"),
-        AIWarning(type: "unsupported", feature: "reasoningEffort", message: "reasoningEffort is only supported by Kimi K3 and has been omitted for model kimi-k2.5."),
+        AIWarning(type: "unsupported", feature: "reasoningEffort", message: "reasoningEffort is only supported by Kimi K3 and has been omitted for model \"kimi-k2.5\"."),
         AIWarning(type: "unsupported", feature: "reasoningHistory 'preserved' is not supported by model \"kimi-k2.5\"")
     ])
     let body = try decodeJSONBody(try #require((await transport.requests()).first?.body))
@@ -561,17 +561,34 @@ import Testing
     #expect(finishReason == "error")
 }
 
-@Test func moonshotLanguageStreamRequiresFirstToolDeltaIDAndNameLikeUpstream() async throws {
-    let transport = RecordingTransport(response: sseResponse(#"""
-    data: {"id":"moonshot-1","model":"kimi-k2.5","choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"type":"function","function":{"name":"weather","arguments":"{}"}}]},"finish_reason":null}]}
+@Test func moonshotLanguageStreamGeneratesMissingToolCallIDAndRequiresNameLikeUpstream() async throws {
+    let transport = RecordingTransport(responses: [
+        sseResponse(#"""
+        data: {"id":"moonshot-1","model":"kimi-k2.5","choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"type":"function","function":{"name":"weather","arguments":"{}"}}]},"finish_reason":null}]}
 
-    data: [DONE]
+        data: [DONE]
 
-    """#))
+        """#),
+        sseResponse(#"""
+        data: {"id":"moonshot-1","model":"kimi-k2.5","choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"id":"call-1","type":"function","function":{"arguments":"{}"}}]},"finish_reason":null}]}
+
+        data: [DONE]
+
+        """#)
+    ])
     let provider = try AIProviders.moonshotAI(configuration: MoonshotAIProviderSettings(apiKey: "moonshot-key", transport: transport))
     let model = try provider.languageModel("kimi-k2.5")
 
-    await #expect(throws: AIError.invalidResponse(provider: "moonshotai.chat", message: "Expected 'id' to be a string.")) {
+    var calls: [AIToolCall] = []
+    for try await part in model.stream(LanguageModelRequest(messages: [.user("Weather?")])) {
+        if case let .toolCall(call) = part { calls.append(call) }
+    }
+    #expect(calls.count == 1)
+    #expect(calls.first?.name == "weather")
+    #expect(calls.first?.arguments == "{}")
+    #expect(calls.first?.id.isEmpty == false)
+
+    await #expect(throws: AIError.invalidResponse(provider: "moonshotai.chat", message: "Expected 'function.name' to be a string.")) {
         for try await _ in model.stream(LanguageModelRequest(messages: [.user("Weather?")])) {}
     }
 }

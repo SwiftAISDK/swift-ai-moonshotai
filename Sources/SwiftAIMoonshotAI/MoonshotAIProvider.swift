@@ -54,9 +54,9 @@ public final class MoonshotAIProvider: AIProvider, Sendable {
     }
 
     public func languageModel(_ modelID: String) throws -> any LanguageModel {
-        var wire = compatibleConfiguration(surface: "chat")
-        configureMoonshotChat(&wire)
-        return OpenAICompatibleChatModel(modelID: modelID, config: wire)
+        var chat = config
+        chat.http.providerID = "moonshotai.chat"
+        return MoonshotAIChatLanguageModel(modelID: modelID, config: chat)
     }
 
     public func embeddingModel(_ modelID: String) throws -> any EmbeddingModel {
@@ -81,22 +81,6 @@ public final class MoonshotAIProvider: AIProvider, Sendable {
 
     public func rerankingModel(_ modelID: String) throws -> any RerankingModel {
         throw AIError.unsupportedModel(provider: providerID, capability: .reranking, modelID: modelID)
-    }
-
-    private func compatibleConfiguration(surface: String) -> OpenAICompatibleModelConfiguration {
-        var http = config.http
-        http.providerID = "moonshotai.\(surface)"
-        var wire = OpenAICompatibleModelConfiguration(http: http, baseURL: config.baseURL)
-        wire.includeUsage = true
-        wire.usesGenericOpenAICompatibleProviderOptions = false
-        wire.allowsEmptyTextResponse = false
-        wire.supportsStructuredOutputs = config.supportsStructuredOutputs
-        wire.supportsMultiPartToolContent = config.supportsMultiPartToolContent
-        wire.maxEmbeddingsPerCall = config.maxEmbeddingsPerCall
-        wire.transformRequestBody = config.transformRequestBody
-        wire.transformRequestBodyWithWarnings = config.transformRequestBodyWithWarnings
-        wire.errorHandler = { apiCallError(provider: "moonshotai.\(surface)", response: $0) }
-        return wire
     }
 
     public func chatModel(_ modelID: String) throws -> any LanguageModel { try languageModel(modelID) }
